@@ -11,7 +11,7 @@ type settings struct {
 	// Server
 	Server struct {
 		Port              string        `default:"8080"`
-		Context           string        `default:"sw-api"`
+		Context           string        `default:"dream-mail-go"`
 		UpdateRefsTimeout time.Duration `default:"4h"`
 	}
 

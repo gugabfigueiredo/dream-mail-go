@@ -26,7 +26,8 @@ func (l *Logger) chainLog(e *zerolog.Event, message string, tags ...any) {
 func (l *Logger) C(tags ...any) *Logger {
 
 	logger := &Logger{
-		Logger: l.Logger,
+		Logger:  l.Logger,
+		context: make(map[string]any),
 	}
 
 	for tag := range l.context {

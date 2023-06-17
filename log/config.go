@@ -23,9 +23,9 @@ type Config struct {
 	// the fields below can be skipped if this value is false!
 	FileLoggingEnabled bool `default:"true"`
 	// Directory to log to when filelogging is enabled
-	Directory string `default:""`
+	Directory string `default:"/var/log/dream-mail-go"`
 	// Filename is the name of the logfile which will be placed inside the directory
-	Filename string `default:""`
+	Filename string `default:"dream-mail-go"`
 	// MaxSize the max size in MB of the logfile before it's rolled
 	MaxSize int `default:"10"`
 	// MaxBackups the max number of rolled files to keep
