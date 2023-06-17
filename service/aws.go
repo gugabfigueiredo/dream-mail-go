@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/aws/aws-sdk-go/service/ses/sesiface"
 	"github.com/gugabfigueiredo/dream-mail-go/log"
 	"github.com/gugabfigueiredo/dream-mail-go/models"
 
@@ -17,7 +18,7 @@ type SESConfig struct {
 
 type SESProvider struct {
 	Logger  *log.Logger
-	Client  *ses.SES
+	Client  sesiface.SESAPI
 	Session *session.Session
 }
 
