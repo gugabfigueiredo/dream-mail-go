@@ -53,16 +53,7 @@ func (s *SESProvider) SendMail(mail *models.Mail) error {
 	result, err := s.Client.SendRawEmail(sesInput)
 	if err != nil {
 		if aerr, ok := err.(awserr.Error); ok {
-			switch aerr.Code() {
-			case ses.ErrCodeMessageRejected:
-				logger.E(ses.ErrCodeMessageRejected, "err", aerr.Error())
-			case ses.ErrCodeMailFromDomainNotVerifiedException:
-				logger.E(ses.ErrCodeMailFromDomainNotVerifiedException, "err", aerr.Error())
-			case ses.ErrCodeConfigurationSetDoesNotExistException:
-				logger.E(ses.ErrCodeConfigurationSetDoesNotExistException, "err", aerr.Error())
-			default:
-				logger.E("unknown error", "err", aerr.Error())
-			}
+			logger.E("unable to send email", "err", aerr.Error(), "code", aerr.Code())
 		} else {
 			logger.E("unknown error", "err", err.Error())
 		}
