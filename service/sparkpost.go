@@ -7,9 +7,13 @@ import (
 	"github.com/pkg/errors"
 )
 
+type ISPClient interface {
+	Send(*sp.Transmission) (id string, res *sp.Response, err error)
+}
+
 type SparkpostProvider struct {
 	Logger *log.Logger
-	Client *sp.Client
+	Client ISPClient
 }
 
 func newSparkpostProvider(cfg *sp.Config, logger *log.Logger) *SparkpostProvider {
@@ -68,7 +72,7 @@ func (s *SparkpostProvider) buildTransmission(mail *models.Mail) *sp.Transmissio
 			From:        mail.From.Addr,
 			Subject:     mail.Subject,
 			Text:        mail.Text,
-			HTML:        mail.Html,
+			HTML:        mail.HTML,
 			Attachments: attachments,
 		},
 	}
