@@ -2,147 +2,220 @@ package service
 
 import (
 	"github.com/sendgrid/rest"
+	"testing"
+
+	"github.com/gugabfigueiredo/dream-mail-go/log"
+	"github.com/gugabfigueiredo/dream-mail-go/models"
+
 	"github.com/sendgrid/sendgrid-go"
 	sgMail "github.com/sendgrid/sendgrid-go/helpers/mail"
-	"testing"
+	"github.com/stretchr/testify/assert"
 )
 
-type MockSendClient struct {
-	status int
-	err    error
+type MockSendGridClient struct {
+	Client     *sendgrid.Client
+	Response   *rest.Response
+	Error      error
+	CalledWith *sgMail.SGMailV3
 }
 
-func (c *MockSendClient) Send(m *sgMail.SGMailV3) (*rest.Response, error) {
-	if c.err != nil {
-		return nil, c.err
-	}
-
-	// Perform any necessary assertions on the SGMailV3 object before returning a mock response
-	// ...
-
-	// Return a mock response
-	return &rest.Response{
-		StatusCode: c.status,
-	}, nil
+func (m *MockSendGridClient) Send(msg *sgMail.SGMailV3) (*rest.Response, error) {
+	m.CalledWith = msg
+	return m.Response, m.Error
 }
 
-func TestSendEmail(t *testing.T) {
-	// Set up your SendGrid API key and client
-	apiKey := "YOUR_API_KEY"
-	client := sendgrid.NewSendClient(apiKey)
-
-	// Define the test cases
-	testCases := []struct {
-		name               string
-		fromName           string
-		fromEmail          string
-		toName             string
-		toEmail            string
-		subject            string
-		contentType        string
-		content            string
-		attachments        []*sgMail.Attachment
-		personalizations   []*sgMail.Personalization
-		expectedStatusCode int
+func TestSendgridProvider_SendMail(t *testing.T) {
+	tests := []struct {
+		name                 string
+		mail                 *models.Mail
+		mockResponse         *rest.Response
+		mockError            error
+		expectedSendGridData *sgMail.SGMailV3
+		expectedError        error
 	}{
 		{
-			name: "e-mail with attachments and personalizations - should call Send and return status ok",
-		},
-		{
-			name: "e-mail with missing key params - should not call Send and return error",
-		},
-		{
-			name: "e-mail",
-		},
-		{
-			name:        "e-mail with personalizations - should call Send and return status ok",
-			fromName:    "Sender Name",
-			fromEmail:   "sender@example.com",
-			toName:      "Recipient Name",
-			toEmail:     "recipient@example.com",
-			subject:     "Test Email",
-			contentType: "text/plain",
-			content:     "Hello, this is a test email!",
-			attachments: []*sgMail.Attachment{
-				{
-					Content:     "Attachment 1 content",
-					Type:        "application/pdf",
-					Filename:    "attachment1.pdf",
-					Disposition: "attachment",
-					ContentID:   "attachment1",
+			name: "send email plaintext",
+			mail: &models.Mail{
+				ID: "1234",
+				From: models.Email{
+					Addr: "sender@domain.com",
+					Name: "Sender",
 				},
-				{
-					Content:     "Attachment 2 content",
-					Type:        "image/jpeg",
-					Filename:    "attachment2.jpg",
-					Disposition: "attachment",
-					ContentID:   "attachment2",
+				To: []models.Email{
+					{
+						Addr: "recipient@domain.com",
+						Name: "Recipient",
+					},
+				},
+				Subject: "Test Subject",
+				Text:    "Test Text",
+			},
+			mockResponse: &rest.Response{},
+			mockError:    nil,
+			expectedSendGridData: &sgMail.SGMailV3{
+				From: sgMail.NewEmail("Sender", "sender@domain.com"),
+				Personalizations: []*sgMail.Personalization{
+					{
+						To: []*sgMail.Email{
+							sgMail.NewEmail("Recipient", "recipient@domain.com"),
+						},
+						CC:                  make([]*sgMail.Email, 0),
+						BCC:                 make([]*sgMail.Email, 0),
+						Headers:             make(map[string]string),
+						Substitutions:       make(map[string]string),
+						CustomArgs:          make(map[string]string),
+						DynamicTemplateData: make(map[string]interface{}),
+						Categories:          make([]string, 0),
+					},
+				},
+				Subject: "Test Subject",
+				Content: []*sgMail.Content{
+					{
+						Type:  "text/plain",
+						Value: "Test Text",
+					},
+				},
+				Attachments: make([]*sgMail.Attachment, 0),
+			},
+			expectedError: nil,
+		},
+		{
+			name: "send email html",
+			mail: &models.Mail{
+				ID: "1234",
+				From: models.Email{
+					Addr: "sender@domain.com",
+					Name: "Sender",
+				},
+				To: []models.Email{
+					{
+						Addr: "recipient@domain.com",
+						Name: "Recipient",
+					},
+				},
+				Subject: "Test Subject",
+				HTML:    "<h1>Hello World!</h1>",
+			},
+			mockResponse: &rest.Response{},
+			mockError:    nil,
+			expectedSendGridData: &sgMail.SGMailV3{
+				From: sgMail.NewEmail("Sender", "sender@domain.com"),
+				Personalizations: []*sgMail.Personalization{
+					{
+						To: []*sgMail.Email{
+							sgMail.NewEmail("Recipient", "recipient@domain.com"),
+						},
+						CC:                  make([]*sgMail.Email, 0),
+						BCC:                 make([]*sgMail.Email, 0),
+						Headers:             make(map[string]string),
+						Substitutions:       make(map[string]string),
+						CustomArgs:          make(map[string]string),
+						DynamicTemplateData: make(map[string]interface{}),
+						Categories:          make([]string, 0),
+					},
+				},
+				Subject: "Test Subject",
+				Content: []*sgMail.Content{
+					{
+						Type:  "text/html",
+						Value: "<h1>Hello World!</h1>",
+					},
+				},
+				Attachments: make([]*sgMail.Attachment, 0),
+			},
+			expectedError: nil,
+		},
+		{
+			name: "send email with attachment",
+			mail: &models.Mail{
+				ID: "1234",
+				From: models.Email{
+					Addr: "sender@domain.com",
+					Name: "Sender",
+				},
+				To: []models.Email{
+					{
+						Addr: "recipient@domain.com",
+						Name: "Recipient",
+					},
+				},
+				Subject: "Test Subject",
+				HTML:    "<h1>Hello World!</h1>",
+				Attachments: []models.Attachment{
+					{
+						Name: "test.txt",
+						Type: "text/plain",
+						Data: "test",
+					},
 				},
 			},
-			personalizations: []*sgMail.Personalization{
-				{
-					To: []*sgMail.Email{
-						sgMail.NewEmail("Recipient Name", "recipient@example.com"),
+			mockResponse: &rest.Response{},
+			mockError:    nil,
+			expectedSendGridData: &sgMail.SGMailV3{
+				From: sgMail.NewEmail("Sender", "sender@domain.com"),
+				Personalizations: []*sgMail.Personalization{
+					{
+						To: []*sgMail.Email{
+							sgMail.NewEmail("Recipient", "recipient@domain.com"),
+						},
+						CC:                  make([]*sgMail.Email, 0),
+						BCC:                 make([]*sgMail.Email, 0),
+						Headers:             make(map[string]string),
+						Substitutions:       make(map[string]string),
+						CustomArgs:          make(map[string]string),
+						DynamicTemplateData: make(map[string]interface{}),
+						Categories:          make([]string, 0),
 					},
-					Subject: "Personalized Subject",
-					Headers: map[string]string{
-						"X-Custom-Header": "Custom Value",
+				},
+				Subject: "Test Subject",
+				Content: []*sgMail.Content{
+					{
+						Type:  "text/html",
+						Value: "<h1>Hello World!</h1>",
 					},
-					Substitutions: map[string]string{
-						"%name%": "John Doe",
-						"%city%": "New York",
+				},
+				Attachments: []*sgMail.Attachment{
+					{
+						Filename:    "test.txt",
+						Type:        "text/plain",
+						Content:     "test",
+						Disposition: "attachment",
 					},
 				},
 			},
-			expectedStatusCode: 202,
+			expectedError: nil,
 		},
-		{
-			name:               "Email without Attachments or Personalizations",
-			fromName:           "Sender Name",
-			fromEmail:          "sender@example.com",
-			toName:             "Recipient Name",
-			toEmail:            "recipient@example.com",
-			subject:            "Test Email",
-			contentType:        "text/plain",
-			content:            "Hello, this is a test email!",
-			attachments:        []*sgMail.Attachment{},
-			personalizations:   []*sgMail.Personalization{},
-			expectedStatusCode: 202,
-		},
-		// Add more test cases here...
 	}
 
-	// Iterate over the test cases
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			// Set up the email content
-			from := sgMail.NewEmail(tc.fromName, tc.fromEmail)
-			to := sgMail.NewEmail(tc.toName, tc.toEmail)
-			content := sgMail.NewContent(tc.contentType, tc.content)
+	logger := log.New(&log.Config{
+		Context:               "dmail-go",
+		ConsoleLoggingEnabled: false,
+		EncodeLogsAsJson:      true,
+	})
 
-			// Create the email message
-			message := sgMail.NewV3MailInit(from, tc.subject, to, content)
-
-			// Add attachments
-			for _, attachment := range tc.attachments {
-				message.AddAttachment(attachment)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Create a mock SendGrid client
+			mockClient := &MockSendGridClient{
+				Response: tt.mockResponse,
+				Error:    tt.mockError,
 			}
 
-			// Add personalizations
-			for _, personalization := range tc.personalizations {
-				message.AddPersonalizations(personalization)
+			// Create a new instance of our service
+			provider := &SendgridProvider{
+				Logger: logger,
+				Client: mockClient,
 			}
 
-			// Send the email
-			response, err := client.Send(message)
-			if err != nil {
-				t.Errorf("Error sending email: %v", err)
-			}
+			err := provider.SendMail(tt.mail)
 
-			// Check the response status code
-			if response.StatusCode != 202 {
-				t.Errorf("Unexpected status code: %d", response.StatusCode)
-			}
+			// Assertions
+			assert.Equal(t, tt.expectedSendGridData.From, mockClient.CalledWith.From, "Unexpected Seder")
+			assert.Equal(t, tt.expectedSendGridData.Personalizations, mockClient.CalledWith.Personalizations, "Unexpected Recipients")
+			assert.Equal(t, tt.expectedSendGridData.Subject, mockClient.CalledWith.Subject, "Unexpected Subject")
+			assert.Equal(t, tt.expectedSendGridData.Content, mockClient.CalledWith.Content, "Unexpected Content")
+			assert.Equal(t, tt.expectedSendGridData.Attachments, mockClient.CalledWith.Attachments, "Unexpected Attachments")
+			assert.Equal(t, tt.expectedError, err, "Unexpected error")
 		})
 	}
 }

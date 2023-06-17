@@ -5,6 +5,7 @@ import (
 	"github.com/gugabfigueiredo/dream-mail-go/log"
 	"github.com/gugabfigueiredo/dream-mail-go/models"
 	"github.com/pkg/errors"
+	"github.com/sendgrid/rest"
 	"github.com/sendgrid/sendgrid-go"
 	sgHelper "github.com/sendgrid/sendgrid-go/helpers/mail"
 )
@@ -13,9 +14,13 @@ type SendgridConfig struct {
 	APIKey string `json:"api_key"`
 }
 
+type ISendgridClient interface {
+	Send(msg *sgHelper.SGMailV3) (*rest.Response, error)
+}
+
 type SendgridProvider struct {
 	Logger *log.Logger
-	Client *sendgrid.Client
+	Client ISendgridClient
 }
 
 func newSendgridProvider(cfg SendgridConfig, logger *log.Logger) *SendgridProvider {
@@ -56,10 +61,14 @@ func (s *SendgridProvider) buildSGMailV3(mail *models.Mail) *sgHelper.SGMailV3 {
 	sgMail.Subject = mail.Subject
 
 	// Set the plain text content
-	sgMail.AddContent(sgHelper.NewContent("text/plain", mail.Text))
+	if mail.Text != "" {
+		sgMail.AddContent(sgHelper.NewContent("text/plain", mail.Text))
+	}
 
 	// Set the HTML content
-	sgMail.AddContent(sgHelper.NewContent("text/html", mail.Html))
+	if mail.HTML != "" {
+		sgMail.AddContent(sgHelper.NewContent("text/html", mail.HTML))
+	}
 
 	// Set the recipients
 	personalization := sgHelper.NewPersonalization()
