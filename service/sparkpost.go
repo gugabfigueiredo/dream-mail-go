@@ -26,10 +26,6 @@ func newSparkpostProvider(cfg *sp.Config, logger *log.Logger) *SparkpostProvider
 	}
 }
 
-func (s *SparkpostProvider) Name() string {
-	return "sendgrid"
-}
-
 func (s *SparkpostProvider) SendMail(mail *models.Mail) error {
 
 	// Create a Transmission
