@@ -16,5 +16,6 @@ docker-build:
 
 docker-run:
 	docker run --rm --name=dream-mail-go \
+		--env-file .env \
 		-p 8080:8080 \
 		dream-mail-go
