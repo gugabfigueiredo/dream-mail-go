@@ -9,3 +9,4 @@ gen
 
 cmd/playground*
 env.sh
+.env
