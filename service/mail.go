@@ -18,23 +18,18 @@ type Config struct {
 	SMTPConfig
 	SESConfig
 	SendgridConfig
-	*sp.Config
+	sp.Config
 }
 
 type Service struct {
 	Logger       *log.Logger
-	Providers    map[string]IProvider
+	Providers    []IProvider
 	mailingQueue chan *models.Mail
 }
 
-func NewService(config Config, logger *log.Logger) *Service {
+var done chan bool
 
-	//create providers instances from config
-	providers := make(map[string]IProvider)
-	providers["ses"] = newSESProvider(config.SESConfig, logger)
-	providers["sendgrid"] = newSendgridProvider(config.SendgridConfig, logger)
-	providers["sparkpost"] = newSparkpostProvider(config.Config, logger)
-	providers["smtp"] = newSMTPProvider(config.SMTPConfig, logger)
+func NewService(providers []IProvider, logger *log.Logger) *Service {
 
 	s := &Service{
 		Logger:       logger,
@@ -42,6 +37,7 @@ func NewService(config Config, logger *log.Logger) *Service {
 		mailingQueue: make(chan *models.Mail, 100),
 	}
 
+	done = make(chan bool)
 	go s.sendQueued()
 
 	return s
@@ -64,10 +60,14 @@ func (s *Service) sendQueued() {
 				}
 				logger.E("unable to send to provider", "err", err)
 			}
+		case <-done:
+			close(s.mailingQueue)
+			return
 		}
 	}
 }
 
 func (s *Service) Quit() {
-	close(s.mailingQueue)
+	done <- true
+	close(done)
 }
