@@ -22,7 +22,7 @@ type Mail struct {
 	To          []Email      `json:"to"`
 	Subject     string       `json:"subject"`
 	Text        string       `json:"text"`
-	Html        string       `json:"html"`
+	HTML        string       `json:"html"`
 	Attachments []Attachment `json:"attachments"`
 }
 
