@@ -36,6 +36,7 @@ func (h *Handler) HandleSend(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		logger.E("invalid or corrupted e-mail data", "err", err)
 		http.Error(w, "invalid or corrupted e-mail data", http.StatusBadRequest)
+		return
 	}
 	// queue mail for delivery
 	h.Service.QueueMail(mail)
