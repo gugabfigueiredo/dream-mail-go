@@ -24,7 +24,7 @@ func NewSMTPProvider(cfg SMTPConfig, logger *log.Logger) *SMTPProvider {
 	return &SMTPProvider{
 		Addr:   fmt.Sprintf("%s:%s", cfg.Host, cfg.Port),
 		Auth:   smtp.PlainAuth("", cfg.User, cfg.Pass, cfg.Host),
-		Logger: logger.C("provider", "smtp"),
+		Logger: logger,
 	}
 }
 

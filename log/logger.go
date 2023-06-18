@@ -12,11 +12,22 @@ type Logger struct {
 
 func (l *Logger) chainLog(e *zerolog.Event, message string, tags ...any) {
 
-	if tags != nil {
-		logger := l.C(tags...)
+	for key, value := range l.context {
+		e = e.Str(key, fmt.Sprintf("%v", value))
+	}
 
-		for key, value := range logger.context {
-			e = e.Str(key, fmt.Sprintf("%v", value))
+	if len(tags)%2 == 1 {
+		l.chainLog(l.Error(), "odd logger tag count", "tags", tags)
+		return
+	}
+
+	if tags != nil {
+		for i := 0; i < len(tags); i += 2 {
+			tag, ok := tags[i].(string)
+			if !ok {
+				panic(fmt.Sprintf("logging tag is not a string. tag: %v", tag))
+			}
+			e = e.Str(tag, fmt.Sprintf("%v", tags[i+1]))
 		}
 	}
 
@@ -39,8 +50,7 @@ func (l *Logger) C(tags ...any) *Logger {
 	}
 
 	if len(tags)%2 == 1 {
-		tags = append(tags, "<MISSINGARG>")
-		l.chainLog(l.Error(), "logger.With: odd argument count", "tags", tags)
+		l.chainLog(l.Error(), "odd logger tag count", "tags", tags)
 	}
 
 	for i := 0; i < len(tags); i += 2 {
@@ -58,7 +68,7 @@ func (l *Logger) With(tags ...any) {
 
 	if len(tags)%2 == 1 {
 		tags = append(tags, "<MISSINGARG>")
-		l.chainLog(l.Error(), "logger.With: odd argument count", "tags", tags)
+		l.chainLog(l.Error(), "odd logger tag count", "tags", tags)
 	}
 
 	for i := 0; i < len(tags); i += 2 {
