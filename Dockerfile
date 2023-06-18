@@ -8,4 +8,5 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o email-service
 FROM alpine:latest
 WORKDIR /app
 COPY --from=builder /app/email-service .
-CMD ["./email-service"]
+COPY .env .
+CMD ["sh", "-c", "source .env && ./email-service"]
