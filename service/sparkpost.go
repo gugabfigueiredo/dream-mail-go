@@ -32,19 +32,18 @@ func NewSparkpostProvider(cfg sp.Config, logger *log.Logger) *SparkpostProvider 
 
 func (s *SparkpostProvider) SendMail(mail *models.Mail) error {
 
+	logger := s.Logger.C("from", mail.From.Addr, "to", mail.To, "subject", mail.Subject, "id", mail.ID)
+
 	// Create a Transmission
 	tx := s.buildTransmission(mail)
 
-	id, _, err := s.Client.Send(tx)
+	id, resp, err := s.Client.Send(tx)
 	if err != nil {
-		s.Logger.E("unable to send email", "err", err)
+		logger.E("unable to send email", "err", err, "statusCode", resp.HTTP.StatusCode)
 		return errors.New("unable to send email")
 	}
 
-	// The second value returned from Send
-	// has more info about the HTTP response, in case
-	// you'd like to see more than the Transmission id.
-	s.Logger.I("transmission sent", "id", id)
+	logger.I("sparkpost transmission sent", "id", id, "statusCode", resp.HTTP.StatusCode)
 
 	return nil
 }

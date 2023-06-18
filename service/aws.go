@@ -61,7 +61,7 @@ func (s *SESProvider) SendMail(mail *models.Mail) error {
 		return err
 	}
 
-	s.Logger.I("SES SendRawEmail successful", "result", result)
+	logger.I("SES SendRawEmail successful", "result", result)
 
 	return nil
 }

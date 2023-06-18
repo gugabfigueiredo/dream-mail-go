@@ -30,6 +30,8 @@ func NewSMTPProvider(cfg SMTPConfig, logger *log.Logger) *SMTPProvider {
 
 func (s *SMTPProvider) SendMail(mail *models.Mail) error {
 
+	logger := s.Logger.C("from", mail.From.Addr, "to", mail.To, "subject", mail.Subject, "id", mail.ID)
+
 	var tos []string
 	for _, to := range mail.To {
 		tos = append(tos, to.Addr)
@@ -39,10 +41,10 @@ func (s *SMTPProvider) SendMail(mail *models.Mail) error {
 
 	err := smtp.SendMail(s.Addr, s.Auth, mail.From.Addr, tos, msg)
 	if err != nil {
-		s.Logger.E("unable to send email", "err", err)
+		logger.E("unable to send email", "err", err)
 		return err
 	}
 
-	s.Logger.I("email sent", "from", mail.From.Addr, "to", tos)
+	logger.I("email sent")
 	return nil
 }

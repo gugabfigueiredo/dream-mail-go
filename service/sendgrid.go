@@ -34,7 +34,7 @@ func NewSendgridProvider(cfg SendgridConfig, logger *log.Logger) *SendgridProvid
 
 func (s *SendgridProvider) SendMail(mail *models.Mail) error {
 
-	logger := s.Logger.C()
+	logger := s.Logger.C("from", mail.From.Addr, "to", mail.To, "subject", mail.Subject, "id", mail.ID)
 
 	// Create an instance of SGMailV3
 	sgMail := s.buildSGMailV3(mail)
@@ -45,7 +45,13 @@ func (s *SendgridProvider) SendMail(mail *models.Mail) error {
 		return errors.New(fmt.Sprintf("failed to send message: %s", err.Error()))
 	}
 
-	logger.I("sgMail request successful", "status", resp.StatusCode)
+	switch resp.StatusCode {
+	case 200, 201, 202:
+		logger.I("sgMail request successful", "status", resp.StatusCode)
+	default:
+		logger.E("sgMail request failed", "status", resp.StatusCode)
+		return errors.New(fmt.Sprintf("sgMail request failed: %d", resp.StatusCode))
+	}
 
 	return nil
 }
