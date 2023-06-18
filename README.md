@@ -29,7 +29,7 @@ go test ./...
 
 ### API
 
-check the API documentation [here](.swagger/swagger.yaml)
+check the API documentation [here](docs/swagger.yaml)
 
 ## Usage
 
