@@ -10,3 +10,4 @@ gen
 cmd/playground*
 env.sh
 .env
+dream-mail-go
