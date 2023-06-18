@@ -3,13 +3,10 @@ log-env:
 	sudo chmod -R 777 /var/log/dream-mail-go/
 
 build:
-	CGO_ENABLED=0 go build -a -installsuffix cgo -o dream-mail-go main.go
+	CGO_ENABLED=0 go build -a -installsuffix cgo -o dream-mail-go ./cmd/dream-mail-server/main.go
 
 run:
-	go run main.go
-
-compose-up:
-	docker-compose up -d
+	go run cmd/dream-mail-go/main.go
 
 compose-down:
 	docker-compose down
