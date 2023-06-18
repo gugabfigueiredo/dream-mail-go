@@ -23,7 +23,7 @@ type SendgridProvider struct {
 	Client ISendgridClient
 }
 
-func newSendgridProvider(cfg SendgridConfig, logger *log.Logger) *SendgridProvider {
+func NewSendgridProvider(cfg SendgridConfig, logger *log.Logger) *SendgridProvider {
 	client := sendgrid.NewSendClient(cfg.APIKey)
 
 	return &SendgridProvider{

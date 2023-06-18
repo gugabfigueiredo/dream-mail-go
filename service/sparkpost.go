@@ -16,10 +16,10 @@ type SparkpostProvider struct {
 	Client ISPClient
 }
 
-func newSparkpostProvider(cfg *sp.Config, logger *log.Logger) *SparkpostProvider {
+func NewSparkpostProvider(cfg sp.Config, logger *log.Logger) *SparkpostProvider {
 
 	var client sp.Client
-	err := client.Init(cfg)
+	err := client.Init(&cfg)
 	if err != nil {
 		logger.F("SparkPost client init failed: %s\n", err)
 	}

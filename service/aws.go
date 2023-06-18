@@ -22,7 +22,7 @@ type SESProvider struct {
 	Session *session.Session
 }
 
-func newSESProvider(cfg SESConfig, logger *log.Logger) *SESProvider {
+func NewSESProvider(cfg SESConfig, logger *log.Logger) *SESProvider {
 	// Create a new session in the us-west-2 region.
 	// Replace us-west-2 with the AWS Region you're using for Amazon SES.
 	sess, err := session.NewSession(&aws.Config{

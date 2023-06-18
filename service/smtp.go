@@ -20,7 +20,7 @@ type SMTPProvider struct {
 	Logger *log.Logger
 }
 
-func newSMTPProvider(cfg SMTPConfig, logger *log.Logger) *SMTPProvider {
+func NewSMTPProvider(cfg SMTPConfig, logger *log.Logger) *SMTPProvider {
 	return &SMTPProvider{
 		Addr:   fmt.Sprintf("%s:%s", cfg.Host, cfg.Port),
 		Auth:   smtp.PlainAuth("", cfg.User, cfg.Pass, cfg.Host),
