@@ -11,7 +11,7 @@ import (
 )
 
 type SendgridConfig struct {
-	APIKey string `json:"api_key"`
+	ApiKey string `json:"api_key"`
 }
 
 type ISendgridClient interface {
@@ -24,7 +24,7 @@ type SendgridProvider struct {
 }
 
 func NewSendgridProvider(cfg SendgridConfig, logger *log.Logger) *SendgridProvider {
-	client := sendgrid.NewSendClient(cfg.APIKey)
+	client := sendgrid.NewSendClient(cfg.ApiKey)
 
 	return &SendgridProvider{
 		Logger: logger.C("provider", "sendgrid"),

@@ -15,10 +15,10 @@ type IProvider interface {
 }
 
 type Config struct {
-	SMTPConfig
-	SESConfig
-	SendgridConfig
-	sp.Config
+	SMTP      SMTPConfig
+	SES       SESConfig
+	Sendgrid  SendgridConfig
+	Sparkpost sp.Config
 }
 
 type Service struct {

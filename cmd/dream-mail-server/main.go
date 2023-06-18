@@ -30,10 +30,10 @@ func main() {
 
 	// Start service
 	mailService := service.NewService([]service.IProvider{
-		service.NewSESProvider(env.Settings.Service.SESConfig, Logger.C("provider", "ses")),
-		service.NewSparkpostProvider(env.Settings.Service.Config, Logger.C("provider", "sparkpost")),
-		service.NewSendgridProvider(env.Settings.Service.SendgridConfig, Logger.C("provider", "sendgrid")),
-		service.NewSMTPProvider(env.Settings.Service.SMTPConfig, Logger.C("provider", "smtp")),
+		service.NewSESProvider(env.Settings.Service.SES, Logger.C("provider", "ses")),
+		service.NewSparkpostProvider(env.Settings.Service.Sparkpost, Logger.C("provider", "sparkpost")),
+		service.NewSendgridProvider(env.Settings.Service.Sendgrid, Logger.C("provider", "sendgrid")),
+		service.NewSMTPProvider(env.Settings.Service.SMTP, Logger.C("provider", "smtp")),
 	}, Logger)
 
 	// Handlers
