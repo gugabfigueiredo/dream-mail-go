@@ -29,7 +29,12 @@ func init() {
 func main() {
 
 	// Start service
-	mailService := service.NewService(env.Settings.Service, Logger)
+	mailService := service.NewService([]service.IProvider{
+		service.NewSESProvider(env.Settings.Service.SESConfig, Logger.C("provider", "ses")),
+		service.NewSparkpostProvider(env.Settings.Service.Config, Logger.C("provider", "sparkpost")),
+		service.NewSendgridProvider(env.Settings.Service.SendgridConfig, Logger.C("provider", "sendgrid")),
+		service.NewSMTPProvider(env.Settings.Service.SMTPConfig, Logger.C("provider", "smtp")),
+	}, Logger)
 
 	// Handlers
 	mailHandler := handler.NewHandler(mailService, Logger)
