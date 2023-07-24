@@ -4,8 +4,8 @@ import (
 	"github.com/sendgrid/rest"
 	"testing"
 
-	"github.com/gugabfigueiredo/dream-mail-go/log"
 	"github.com/gugabfigueiredo/dream-mail-go/models"
+	log "github.com/gugabfigueiredo/tiny-go-log"
 
 	"github.com/sendgrid/sendgrid-go"
 	sgMail "github.com/sendgrid/sendgrid-go/helpers/mail"

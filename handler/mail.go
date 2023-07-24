@@ -3,9 +3,9 @@ package handler
 import (
 	"encoding/json"
 	"github.com/google/uuid"
-	"github.com/gugabfigueiredo/dream-mail-go/log"
 	"github.com/gugabfigueiredo/dream-mail-go/models"
 	"github.com/gugabfigueiredo/dream-mail-go/service"
+	log "github.com/gugabfigueiredo/tiny-go-log"
 	"net/http"
 )
 

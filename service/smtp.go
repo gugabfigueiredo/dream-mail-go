@@ -2,8 +2,8 @@ package service
 
 import (
 	"fmt"
-	"github.com/gugabfigueiredo/dream-mail-go/log"
 	"github.com/gugabfigueiredo/dream-mail-go/models"
+	log "github.com/gugabfigueiredo/tiny-go-log"
 	"net/smtp"
 )
 

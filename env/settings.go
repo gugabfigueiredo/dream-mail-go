@@ -2,8 +2,8 @@ package env
 
 import (
 	"encoding/json"
-	"github.com/gugabfigueiredo/dream-mail-go/log"
 	"github.com/gugabfigueiredo/dream-mail-go/service"
+	log "github.com/gugabfigueiredo/tiny-go-log"
 )
 
 type settings struct {

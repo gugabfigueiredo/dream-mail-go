@@ -1,13 +1,12 @@
 package service
 
 import (
+	log "github.com/gugabfigueiredo/tiny-go-log"
 	"testing"
-
-	"github.com/gugabfigueiredo/dream-mail-go/log"
-	"github.com/gugabfigueiredo/dream-mail-go/models"
 
 	"github.com/aws/aws-sdk-go/service/ses"
 	"github.com/aws/aws-sdk-go/service/ses/sesiface"
+	"github.com/gugabfigueiredo/dream-mail-go/models"
 	"github.com/stretchr/testify/assert"
 )
 
